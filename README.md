@@ -12,18 +12,16 @@ The Notion database is used as the single source of truth, so the service does n
 data looks like this:
 
 ```mermaid
-flowchart TD
-    CLIENT[Client] -->|GET /r/mydb/000-123| FWD
-
-    FWD[Notion Forwarder]
-
-    FWD-->|Query user-defined Primary Keys + URL|API
-
-    subgraph API[Notion API]
-        C[User-defined Database]
-    end
-
-    FWD-->|URL Forward to Item URL|CLIENT
+sequenceDiagram
+    Client->>+Forwarder: GET /r/mydb/000-123
+    Forwarder->>Forwarder: Check Cache
+    Forwarder->>Forwarder: ID "000-123" not found in cache for "mydb"
+    Forwarder->>Forwarder: Check: Database name "mydb" has Notion ID "1a2b3c4d..."
+    Forwarder->>Forwarder: Check: Database name "mydb" has Forward Column ID "Asset ID"
+    Forwarder->>+Notion API: Query Database with Notion ID "1a2b3c4d-..." <br> where property "Asset ID" has value "000-123"
+    Notion API-->>-Forwarder: Found Page in Database
+    Forwarder->>Forwarder: Save Page in Cache
+    Forwarder-->>-Client: 302 Found https://notion.so/...
 ```
 
 As Notion does not have any webhooks that can notify the forward service when a change is made, this service has to poll
