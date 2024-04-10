@@ -2,14 +2,18 @@ package dependencies
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/jomei/notionapi"
+	"log/slog"
 	"notion-forwarder/models"
 )
 
 var ErrDatabaseNotFound = fmt.Errorf("database not found")
 var ErrItemNotFound = fmt.Errorf("item not found")
+
+var ErrForwardingPropNotFound = fmt.Errorf("forwarding property not found")
+
+var ErrForwardingPropNotRichText = fmt.Errorf("forwarding property is not a RichTextProperty")
 
 type NotionForwardingClient struct {
 	client             *notionapi.Client
@@ -38,11 +42,11 @@ func addPageUrlToForwardingDict(page notionapi.Page, database *models.ForwardedD
 	// Get forwarding from page
 	forwarding := page.Properties[database.ForwardColumnName]
 	if forwarding == nil {
-		return errors.New("Forwarding property not found")
+		return ErrForwardingPropNotFound
 	}
 	// check that forwarding is a RichTextProperty
 	if forwarding.GetType() != notionapi.PropertyTypeRichText {
-		return errors.New("Forwarding property is not a RichTextProperty")
+		return ErrForwardingPropNotRichText
 	}
 
 	// convert forwarding property to string
@@ -76,6 +80,7 @@ func refreshForwardedDatabase(client *notionapi.Client, database *models.Forward
 			notionapi.DatabaseID(database.DatabaseId),
 			&requestBody)
 		if err != nil {
+			// notion api returned error
 			return err
 		}
 
@@ -109,14 +114,14 @@ func NewNotionForwardingClient(integrationToken string, databases []models.Forwa
 
 func (n NotionForwardingClient) PopulateForwardedDatabases() error {
 	if len(n.forwardedDatabases) == 0 {
-		fmt.Printf("no databases to populate")
+		slog.Warn("no databases to populate")
 	}
 	for _, database := range n.forwardedDatabases {
 		err := refreshForwardedDatabase(n.client, &database)
 		if err != nil {
 			return err
 		}
-		fmt.Printf("Populated Database %v with %d entries \n ", database.Name, len(database.ForwardingDict))
+		slog.Info("populated database", "database", database.Name, "entries", len(database.ForwardingDict))
 	}
 	return nil
 }
@@ -124,25 +129,28 @@ func (n NotionForwardingClient) PopulateForwardedDatabases() error {
 func (n NotionForwardingClient) GetForwarding(databaseName string, itemId string) ([]string, error) {
 	result, err := n.GetForwardingCached(databaseName, itemId)
 	if err == nil {
+		slog.Debug("Forwarding found in cache", "database", databaseName, "itemId", itemId)
 		return result, nil
 	}
 
 	result, err = n.GetForwardingFromNotion(databaseName, itemId)
 	if err == nil {
+		slog.Debug("Forwarding found in Notion", "database", databaseName, "itemId", itemId)
 		return result, nil
 	}
+	slog.Debug("Forwarding not found", "database", databaseName, "itemId", itemId)
 	return nil, err
 }
 
 func (n NotionForwardingClient) GetForwardingCached(databaseName string, itemId string) ([]string, error) {
 	forwDb, ok := n.forwardedDatabases[databaseName]
 	if !ok {
-		return nil, errors.New("database not found")
+		return nil, ErrDatabaseNotFound
 	}
 
 	entry, ok := forwDb.ForwardingDict[itemId]
 	if !ok {
-		return nil, errors.New("item not found")
+		return nil, ErrItemNotFound
 	}
 
 	return entry.Urls, nil

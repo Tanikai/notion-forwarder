@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/go-chi/chi/v5"
+	"log/slog"
 	"net/http"
 	"notion-forwarder/dependencies"
 )
@@ -12,13 +13,10 @@ type NotionForwardHandler struct {
 	notionClient *dependencies.NotionForwardingClient
 }
 
-func forwardToItem(databaseId string, itemId string) []string {
-	return []string{"https://www.notion.so/" + databaseId + "/" + itemId}
-}
-
 func (h NotionForwardHandler) ForwardItem(w http.ResponseWriter, r *http.Request) {
 	databaseId := chi.URLParam(r, "databaseId")
 	itemId := chi.URLParam(r, "itemId")
+	slog.Debug("ForwardItem", "databaseId", databaseId, "itemId", itemId)
 
 	forwardings, err := h.notionClient.GetForwarding(databaseId, itemId)
 	if err != nil {

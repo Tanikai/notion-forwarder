@@ -1,13 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/knadh/koanf/parsers/json"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
-	"log"
+	"log/slog"
 	"net/http"
 	"notion-forwarder/dependencies"
 	"notion-forwarder/handlers"
@@ -19,19 +18,19 @@ var k = koanf.New(".")
 func main() {
 	// Load config
 	if err := k.Load(file.Provider("./config.json"), json.Parser()); err != nil {
-		log.Fatalf("error loading config: %v", err)
+		slog.Error("error loading config", err)
 		return
 	}
 	var config models.NotionForwarderConfig
 	if err := k.Unmarshal("", &config); err != nil {
-		log.Fatalf("error loading config, could not unmarshal: %v", err)
+		slog.Error("error loading config, could not unmarshal", err)
 		return
 	}
 
 	client := dependencies.NewNotionForwardingClient(config.IntegrationToken, config.Databases)
 
 	if err := client.PopulateForwardedDatabases(); err != nil {
-		log.Fatalf("error populating database: %v", err)
+		slog.Error("error populating database", err)
 		return
 	}
 
@@ -45,7 +44,7 @@ func main() {
 	})
 	r.Mount("/r", handlers.NotionForwarderRoutes(client))
 
-	fmt.Printf("Starting server on :3000\n")
+	slog.Info("Starting server on port :3000")
 	if err := http.ListenAndServe(":3000", r); err != nil {
 		return
 	}
