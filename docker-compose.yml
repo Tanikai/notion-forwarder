@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+  notion-forwarder:
+    build: .
+    container_name: notion-forwarder
+    restart: unless-stopped
+    ports:
+      # Host:Container
+      - "3000:3000"
+    volumes:
+      - ./config.json:/app/config.json

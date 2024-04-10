@@ -1,0 +1,16 @@
+Dockerfile
+vendor/
+.dockerignore
+.gcloudignore
+.gitignore
+.editorconfig
+.git
+AUTHORS.md
+CONTRIBUTING.md
+LICENSE
+Makefile
+NOTICE
+README.md
+arm/
+powerpc/
+mips/
