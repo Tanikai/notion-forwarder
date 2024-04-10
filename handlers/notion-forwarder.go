@@ -13,6 +13,17 @@ type NotionForwardHandler struct {
 	notionClient *dependencies.NotionForwardingClient
 }
 
+// ForwardItem godoc
+// @Summary Forward client with databaseId and itemId to Notion Page URL
+// @Description Forward client with databaseId and itemId to Notion Page URL
+// @Param databaseId path string true "Database ID from config.json"
+// @Param itemId path string true "Item ID from forwarded column"
+// @Success 302 "Found"
+// @Success 300 "Multiple Choices"
+// @Failure 404 "Database name not found in configuration"
+// @Failure 404 "Item ID not found"
+// @Failure 500 "Internal Server Error"
+// @Router /r/{databaseId}/{itemId} [get]
 func (h NotionForwardHandler) ForwardItem(w http.ResponseWriter, r *http.Request) {
 	databaseId := chi.URLParam(r, "databaseId")
 	itemId := chi.URLParam(r, "itemId")

@@ -99,6 +99,16 @@ and `forward_column_name` fields as well.
 
 todo
 
+## API Docs
+
+To generate the API documentation, run the following commands and
+open [http://localhost:3000/swagger/index.html](http://localhost:3000/swagger/index.html) in your browser.
+
+```shell
+swag init
+go run .
+```
+
 ## Author
 
 Kai Anter - [GitHub](https://github.com/Tanikai) - [Mastodon](https://hachyderm.io/@Tanikai)

@@ -6,12 +6,23 @@ import (
 	"github.com/knadh/koanf/parsers/json"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
+	"github.com/swaggo/http-swagger"
 	"log/slog"
 	"net/http"
 	"notion-forwarder/dependencies"
+	_ "notion-forwarder/docs"
 	"notion-forwarder/handlers"
 	"notion-forwarder/models"
 )
+
+// @title Notion Forwarder API
+// @version 1.0
+// @description This is the API for the Notion Forwarder service
+
+// @license.name AGPL-3.0
+// @license.url https://www.gnu.org/licenses/agpl-3.0.html
+
+// @BasePath /
 
 var k = koanf.New(".")
 
@@ -42,7 +53,12 @@ func main() {
 			return
 		}
 	})
+
 	r.Mount("/r", handlers.NotionForwarderRoutes(client))
+
+	r.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:3000/swagger/doc.json"),
+	))
 
 	slog.Info("Starting server on port :3000")
 	if err := http.ListenAndServe(":3000", r); err != nil {

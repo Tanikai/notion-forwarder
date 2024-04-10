@@ -1,0 +1,35 @@
+basePath: /
+info:
+  contact: {}
+  description: This is the API for the Notion Forwarder service
+  license:
+    name: AGPL-3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.html
+  title: Notion Forwarder API
+  version: "1.0"
+paths:
+  /r/{databaseId}/{itemId}:
+    get:
+      description: Forward client with databaseId and itemId to Notion Page URL
+      parameters:
+      - description: Database ID from config.json
+        in: path
+        name: databaseId
+        required: true
+        type: string
+      - description: Item ID from forwarded column
+        in: path
+        name: itemId
+        required: true
+        type: string
+      responses:
+        "300":
+          description: Multiple Choices
+        "302":
+          description: Found
+        "404":
+          description: Item ID not found
+        "500":
+          description: Internal Server Error
+      summary: Forward client with databaseId and itemId to Notion Page URL
+swagger: "2.0"

@@ -1,0 +1,52 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is the API for the Notion Forwarder service",
+        "title": "Notion Forwarder API",
+        "contact": {},
+        "license": {
+            "name": "AGPL-3.0",
+            "url": "https://www.gnu.org/licenses/agpl-3.0.html"
+        },
+        "version": "1.0"
+    },
+    "basePath": "/",
+    "paths": {
+        "/r/{databaseId}/{itemId}": {
+            "get": {
+                "description": "Forward client with databaseId and itemId to Notion Page URL",
+                "summary": "Forward client with databaseId and itemId to Notion Page URL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Database ID from config.json",
+                        "name": "databaseId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Item ID from forwarded column",
+                        "name": "itemId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "300": {
+                        "description": "Multiple Choices"
+                    },
+                    "302": {
+                        "description": "Found"
+                    },
+                    "404": {
+                        "description": "Item ID not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        }
+    }
+}
