@@ -33,6 +33,7 @@ the Notion API in regular intervals or when a request is made.
 
 ### Configuration File (config.json)
 
+- `log_level`: Log level ( debug, info, warn, error)
 - `integration_token`: Notion API token
 - `forwarded_databases`: Array of databases to forward
     - `name`: Name of the database (used in the forwarding service URL)
@@ -43,6 +44,7 @@ Example configuration for two forwarded databases:
 
 ```json5
 {
+  "log_level": "info",
   "integration_token": "secret_....",
   "lazy_load": false,
   "forwarded_databases": [

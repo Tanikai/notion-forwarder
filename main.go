@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/knadh/koanf/parsers/json"
@@ -13,6 +14,7 @@ import (
 	_ "notion-forwarder/docs"
 	"notion-forwarder/handlers"
 	"notion-forwarder/models"
+	"strings"
 )
 
 // @title Notion Forwarder API
@@ -26,23 +28,63 @@ import (
 
 var k = koanf.New(".")
 
-func main() {
+func parseConfig() (models.NotionForwarderConfig, error) {
 	// Load config
 	if err := k.Load(file.Provider("./config.json"), json.Parser()); err != nil {
 		slog.Error("error loading config", err)
-		return
+		return models.NotionForwarderConfig{}, errors.New("could not load config")
 	}
 	var config models.NotionForwarderConfig
 	if err := k.Unmarshal("", &config); err != nil {
 		slog.Error("error loading config, could not unmarshal", err)
+		return models.NotionForwarderConfig{}, errors.New("could not unmarshal config")
+	}
+	return config, nil
+}
+
+func setLogLevel(logLevel string) error {
+	level := strings.ToLower(logLevel)
+	switch level {
+	case "debug":
+		slog.SetLogLoggerLevel(slog.LevelDebug)
+		break
+	case "info":
+		slog.SetLogLoggerLevel(slog.LevelInfo)
+		break
+	case "warn":
+		slog.SetLogLoggerLevel(slog.LevelWarn)
+		break
+	case "error":
+		slog.SetLogLoggerLevel(slog.LevelError)
+		break
+	default:
+		return errors.New("invalid log level")
+	}
+	slog.Info("Set log level", "log_level", logLevel)
+	return nil
+}
+
+func main() {
+	config, err := parseConfig()
+	if err != nil {
+		slog.Error("error parsing config, exiting", err)
+		return
+	}
+
+	if err := setLogLevel(config.LogLevel); err != nil {
+		slog.Error("error setting log level", err)
 		return
 	}
 
 	client := dependencies.NewNotionForwardingClient(config.IntegrationToken, config.Databases)
 
-	if err := client.PopulateForwardedDatabases(); err != nil {
-		slog.Error("error populating database", err)
-		return
+	if !config.LazyLoad {
+		if err := client.PopulateForwardedDatabases(); err != nil {
+			slog.Error("error populating database", err)
+			return
+		}
+	} else {
+		slog.Info("Lazy loading enabled, entries will be fetched on demand")
 	}
 
 	r := chi.NewRouter()

@@ -7,6 +7,7 @@ type ForwardedDatabaseConfig struct {
 }
 
 type NotionForwarderConfig struct {
+	LogLevel         string                    `koanf:"log_level"`
 	IntegrationToken string                    `koanf:"integration_token" validate:"required"`
 	LazyLoad         bool                      `koanf:"lazy_load"`
 	Databases        []ForwardedDatabaseConfig `koanf:"forwarded_databases" validate:"required"`
