@@ -19,7 +19,7 @@ import (
 )
 
 // @title Notion Forwarder API
-// @version 1.0
+// @version 1.1
 // @description This is the API for the Notion Forwarder service
 
 // @license.name AGPL-3.0
