@@ -3,9 +3,10 @@ package dependencies
 import (
 	"context"
 	"fmt"
-	"github.com/jomei/notionapi"
 	"log/slog"
 	"notion-forwarder/models"
+
+	"github.com/jomei/notionapi"
 )
 
 var ErrDatabaseNotFound = fmt.Errorf("database not found")

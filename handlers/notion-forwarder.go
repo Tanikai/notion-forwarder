@@ -3,10 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/go-chi/chi/v5"
 	"log/slog"
 	"net/http"
 	"notion-forwarder/dependencies"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type NotionForwardHandler struct {

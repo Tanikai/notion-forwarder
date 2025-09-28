@@ -65,6 +65,12 @@ Example configuration for two forwarded databases:
 }
 ```
 
+### Running for development
+
+```shell
+go run .
+```
+
 ## Deployment
 
 In order to use this service, follow these steps:
