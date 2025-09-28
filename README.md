@@ -1,4 +1,4 @@
-# wForwarder for Notion
+# URL Forwarder for Notion
 
 ## About
 
