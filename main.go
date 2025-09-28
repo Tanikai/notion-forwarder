@@ -2,12 +2,6 @@ package main
 
 import (
 	"errors"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/knadh/koanf/parsers/json"
-	"github.com/knadh/koanf/providers/file"
-	"github.com/knadh/koanf/v2"
-	"github.com/swaggo/http-swagger"
 	"log/slog"
 	"net/http"
 	"notion-forwarder/dependencies"
@@ -15,6 +9,13 @@ import (
 	"notion-forwarder/handlers"
 	"notion-forwarder/models"
 	"strings"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/knadh/koanf/parsers/json"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
+	"github.com/swaggo/http-swagger"
 )
 
 // @title Notion Forwarder API
