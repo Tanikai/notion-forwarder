@@ -1,6 +1,6 @@
-FROM golang:1.25-alpine
+FROM golang:1.26-alpine AS build
 
-WORKDIR /app
+WORKDIR /src
 
 COPY go.mod go.sum ./
 
@@ -8,8 +8,14 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/notion-forwarder .
+
+FROM gcr.io/distroless/static-debian12:nonroot
+
+WORKDIR /app
+
+COPY --from=build /out/notion-forwarder ./notion-forwarder
 
 EXPOSE 3000
 
-CMD ["./main"]
+ENTRYPOINT ["./notion-forwarder"]
