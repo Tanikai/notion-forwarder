@@ -14,3 +14,9 @@ README.md
 arm/
 powerpc/
 mips/
+config.json
+notion-forwarder
+main
+.idea/
+.github/
+.DS_Store
